@@ -3,7 +3,7 @@
 ## Lien vers le TP1
 
 Le code du TP1 se trouve dans le dossier :  
-[TP1 - Profile Screen](./feature/tp1-profile-card)
+[TP1 - Profile Screen](../rn-advanced-labs/app/tp1-profile-card/)
 
 ## Description de l'écran
 
