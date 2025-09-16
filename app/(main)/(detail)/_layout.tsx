@@ -10,11 +10,21 @@ export default function DetailLayout() {
     <Stack
       screenOptions={{
         headerShown: true,
-        gestureEnabled: true,
+        gestureEnabled: false,
       }}
     >
       <Stack.Screen
         name="[id]"
+        dangerouslySingular
+        listeners={({ navigation, route }) => ({
+          beforeRemove: (e) => {
+            const actionType = (e as any)?.data?.action?.type;
+            if (actionType === "POP" || actionType === "GO_BACK") {
+              e.preventDefault();
+              router.replace("/(main)/");
+            }
+          },
+        })}
         options={{
           title: "Détail",
           headerBackTitle: "Retour",
