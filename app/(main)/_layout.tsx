@@ -42,7 +42,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="detail"
+        name="tp3-forms/formik"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="tp3-forms/rhf"
         options={{
           href: null,
         }}
