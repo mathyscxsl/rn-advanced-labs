@@ -36,6 +36,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="tp4-robots"
+        options={{
+          title: "Robots",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="cursor.rays" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="(detail)"
         options={{
           href: null,
