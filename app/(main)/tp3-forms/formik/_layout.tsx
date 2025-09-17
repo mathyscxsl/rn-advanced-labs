@@ -1,9 +1,15 @@
+import * as Haptics from "expo-haptics";
 import { Stack, router } from "expo-router";
 import { Platform, Text, TouchableOpacity } from "react-native";
 
 export default function FormikLayout() {
   const handleBackPress = () => {
     router.replace("/(main)/");
+  };
+
+  const handleSwitchToRHF = () => {
+    Haptics.selectionAsync();
+    router.replace("/(main)/tp3-forms/rhf");
   };
 
   return (
@@ -35,6 +41,7 @@ export default function FormikLayout() {
                 paddingVertical: 8,
                 marginLeft: Platform.OS === "ios" ? -8 : 0,
               }}
+              accessibilityLabel="Revenir à l'accueil"
             >
               <Text
                 style={{
@@ -44,6 +51,27 @@ export default function FormikLayout() {
                 }}
               >
                 {Platform.OS === "ios" ? "← Retour" : "← Accueil"}
+              </Text>
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={handleSwitchToRHF}
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                marginRight: Platform.OS === "ios" ? -8 : 0,
+              }}
+              accessibilityLabel="Basculer vers le formulaire RHF"
+            >
+              <Text
+                style={{
+                  color: Platform.OS === "ios" ? "#007AFF" : "#000",
+                  fontSize: 17,
+                  fontWeight: Platform.OS === "ios" ? "400" : "bold",
+                }}
+              >
+                ⇄ RHF
               </Text>
             </TouchableOpacity>
           ),

@@ -9,11 +9,13 @@ Ajouts récents (TP3 - Forms):
 
 - Formulaire (Formik) — `/(main)/tp3-forms/formik`
 - Formulaire (RHF + Zod) — `/(main)/tp3-forms/rhf`
+- Depuis chaque formulaire, un bouton dans le header permet de basculer rapidement vers l'autre (Formik ⇄ RHF) sans revenir à l'accueil.
 
 Accès depuis l'accueil (Home):
 
 - Lien « Formulaire (Formik) » présent sur la page d’accueil.
-- Le formulaire RHF est accessible via lien interne `/(main)/tp3-forms/rhf` (ou via deep link externe `/tp3-forms/rhf`).
+- Lien « Formulaire (RHF + Zod) » présent sur la page d’accueil.
+- Les deux écrans proposent un bouton de switch dans le header (⇄) pour naviguer entre eux avec retour haptique.
 
 ## Persistance et UX mobile
 
@@ -69,8 +71,10 @@ rn-advanced-labs
     │   │   └── [id].tsx           # Écran Détail dynamique
     │   └── tp3-forms/
     │       ├── formik/
+    │       │   ├── _layout.tsx    # Stack custom + bouton switch ⇄ RHF
     │       │   └── index.tsx      # Formulaire avec Formik + Yup
     │       └── rhf/
+    │           ├── _layout.tsx    # Stack custom + bouton switch ⇄ Formik
     │           └── index.tsx      # Formulaire avec RHF + Zod
     └── (auth)/                    # (placeholder)
 ```
@@ -140,7 +144,7 @@ Recommandations:
 
 - Ouvrir un détail depuis l’accueil: boutons « Page de l'ID … » dans `Home`.
 - Formulaires:
-  - Formik: `/(main)/tp3-forms/formik` (lien déjà présent sur Home).
-  - RHF: `/(main)/tp3-forms/rhf` (ajouter un lien dans Home si besoin).
+  - Formik: `/(main)/tp3-forms/formik` (lien présent sur Home + bouton switch depuis RHF).
+  - RHF: `/(main)/tp3-forms/rhf` (lien présent sur Home + bouton switch depuis Formik).
 - Tuer l’app puis relancer: la dernière route est restaurée (par ex. l’écran Détail ou une page Formulaire).
 - Tester le deep link (Android): `adb shell am start -W -a android.intent.action.VIEW -d "rnadvancedlabs://tp3-forms/formik" com.example.rnadvancedlabs`.
