@@ -11,7 +11,6 @@ interface RobotsState {
   robots: Robot[];
   selectedId?: string;
 
-  // Actions
   create: (robot: RobotInput) => void;
   update: (id: string, robot: RobotInput) => void;
   remove: (id: string) => void;
