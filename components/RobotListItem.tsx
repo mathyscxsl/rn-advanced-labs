@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#eee",
   },
-  name: { fontSize: 16, fontWeight: "bold" },
-  details: { color: "#555" },
+  name: { fontSize: 16, fontWeight: "bold", color: "#000" },
+  details: { color: "#000" },
   actions: { flexDirection: "row" },
   button: {
     marginLeft: 8,

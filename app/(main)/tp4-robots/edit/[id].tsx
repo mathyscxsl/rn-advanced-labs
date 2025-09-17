@@ -10,7 +10,7 @@ const EditRobotScreen = () => {
   if (!id || typeof id !== "string") return null;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: "#f0f0f0" }}>
       <RobotForm robotId={id} onSubmitSuccess={() => router.back()} />
     </View>
   );

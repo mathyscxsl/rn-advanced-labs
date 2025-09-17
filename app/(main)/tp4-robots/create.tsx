@@ -7,7 +7,7 @@ const CreateRobotScreen = () => {
   const router = useRouter();
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: "#f0f0f0" }}>
       <RobotForm onSubmitSuccess={() => router.back()} />
     </View>
   );

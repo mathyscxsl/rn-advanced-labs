@@ -46,8 +46,8 @@ const RobotListScreen = () => {
 export default RobotListScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  empty: { textAlign: "center", marginTop: 20, color: "#555" },
+  container: { flex: 1, backgroundColor: "#f0f0f0" },
+  empty: { textAlign: "center", marginTop: 20, color: "#000" },
   fab: {
     position: "absolute",
     right: 20,

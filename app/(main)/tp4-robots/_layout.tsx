@@ -11,6 +11,15 @@ export default function FormikLayout() {
       screenOptions={{
         headerShown: true,
         gestureEnabled: false,
+        contentStyle: { backgroundColor: "#f0f0f0" },
+        // Header bar in black
+        headerStyle: { backgroundColor: "#000" },
+        headerTransparent: false,
+        headerShadowVisible: true,
+        // Title in white for contrast
+        headerTitleStyle: { color: "#fff" },
+        // Tint default icons/buttons in blue
+        headerTintColor: "#007AFF",
       }}
     >
       <Stack.Screen
@@ -39,7 +48,8 @@ export default function FormikLayout() {
             >
               <Text
                 style={{
-                  color: Platform.OS === "ios" ? "#007AFF" : "#000",
+                  // Blue back text as originally on iOS, and for visibility on dark header on Android too
+                  color: "#007AFF",
                   fontSize: 17,
                   fontWeight: Platform.OS === "ios" ? "400" : "bold",
                 }}
