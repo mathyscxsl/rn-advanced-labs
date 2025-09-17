@@ -47,6 +47,12 @@ export default function TabLayout() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="tp3-forms/formik/index"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
