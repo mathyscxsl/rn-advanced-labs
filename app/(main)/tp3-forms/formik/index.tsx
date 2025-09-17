@@ -1,9 +1,13 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { useFocusEffect } from "@react-navigation/native";
+import { router } from "expo-router";
 import { Formik } from "formik";
 import React from "react";
 import {
   Alert,
+  BackHandler,
+  Platform,
   ScrollView,
   StyleSheet,
   Switch,
@@ -23,6 +27,17 @@ const initialValues: SignupForm = {
 };
 
 export default function FormikSignupScreen() {
+  // Intercepte le bouton Android retour et remplace par l'accueil
+  useFocusEffect(
+    React.useCallback(() => {
+      const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+        router.replace("/(main)/");
+        return true;
+      });
+      return () => sub.remove();
+    }, [])
+  );
+
   const onSubmit = (values: SignupForm) => {
     Alert.alert("Formulaire soumis", JSON.stringify(values, null, 2));
   };
@@ -33,7 +48,9 @@ export default function FormikSignupScreen() {
       keyboardShouldPersistTaps="handled"
     >
       <ThemedView style={styles.container}>
-        <ThemedText type="title">Créer un compte</ThemedText>
+        <ThemedText type="title" style={{ color: "#000" }}>
+          Créer un compte
+        </ThemedText>
 
         <Formik<SignupForm>
           initialValues={initialValues}
@@ -166,6 +183,17 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 12,
     backgroundColor: "#f0f0f0",
+  },
+  backButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    alignSelf: "flex-start",
+    marginLeft: Platform.OS === "ios" ? -8 : 0,
+  },
+  backText: {
+    color: Platform.OS === "ios" ? "#007AFF" : "#000",
+    fontSize: 17,
+    fontWeight: Platform.OS === "ios" ? "400" : "bold",
   },
   form: {
     gap: 8,

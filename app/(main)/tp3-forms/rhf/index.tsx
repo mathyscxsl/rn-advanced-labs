@@ -1,10 +1,14 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { router } from "expo-router";
+import React, { useCallback } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
+  BackHandler,
+  Platform,
   ScrollView,
   StyleSheet,
   Switch,
@@ -24,6 +28,16 @@ const defaultValues: RHFSignupForm = {
 };
 
 export default function RHFSignupScreen() {
+  useFocusEffect(
+    useCallback(() => {
+      const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+        router.replace("/(main)/");
+        return true;
+      });
+      return () => sub.remove();
+    }, [])
+  );
+
   const { control, handleSubmit, formState } = useForm<RHFSignupForm>({
     defaultValues,
     resolver: zodResolver(rhfSignupSchema),
@@ -42,7 +56,9 @@ export default function RHFSignupScreen() {
       keyboardShouldPersistTaps="handled"
     >
       <ThemedView style={styles.container}>
-        <ThemedText type="title">Créer un compte (RHF)</ThemedText>
+        <ThemedText type="title" style={{ color: "#000" }}>
+          Créer un compte
+        </ThemedText>
 
         <Text style={styles.label}>Email</Text>
         <Controller
@@ -175,6 +191,17 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 12,
     backgroundColor: "#f0f0f0",
+  },
+  backButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    alignSelf: "flex-start",
+    marginLeft: Platform.OS === "ios" ? -8 : 0,
+  },
+  backText: {
+    color: Platform.OS === "ios" ? "#007AFF" : "#000",
+    fontSize: 17,
+    fontWeight: Platform.OS === "ios" ? "400" : "bold",
   },
   label: {
     fontWeight: "600",
