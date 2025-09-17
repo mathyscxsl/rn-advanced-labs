@@ -29,7 +29,17 @@ export default function HomeScreen() {
 
       <Link href="/(main)/tp3-forms/formik" asChild>
         <TouchableOpacity style={styles.button}>
-          <ThemedText style={styles.buttonText}>Formulaire (Formik)</ThemedText>
+          <ThemedText style={styles.buttonText}>
+            Formulaire (Formik + Yup)
+          </ThemedText>
+        </TouchableOpacity>
+      </Link>
+
+      <Link href="/(main)/tp3-forms/rhf" asChild>
+        <TouchableOpacity style={styles.button}>
+          <ThemedText style={styles.buttonText}>
+            Formulaire (RHF + Zod)
+          </ThemedText>
         </TouchableOpacity>
       </Link>
     </ThemedView>

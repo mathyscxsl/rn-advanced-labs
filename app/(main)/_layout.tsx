@@ -42,13 +42,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="detail"
+        name="tp3-forms/formik/index"
         options={{
           href: null,
         }}
       />
       <Tabs.Screen
-        name="tp3-forms/formik/index"
+        name="tp3-forms/rhf/index"
         options={{
           href: null,
         }}
