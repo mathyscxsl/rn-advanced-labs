@@ -1,7 +1,8 @@
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import { Photo } from "./types";
 
-const PHOTOS_DIR = `${FileSystem.documentDirectory}photos`;
+const DOC_DIR = (FileSystem as any).documentDirectory ?? (FileSystem as any).cacheDirectory ?? "file:///";
+const PHOTOS_DIR = `${DOC_DIR}photos`;
 
 export async function ensurePhotoDirExists() {
     const dirInfo = await FileSystem.getInfoAsync(PHOTOS_DIR);
@@ -20,12 +21,13 @@ export async function savePhoto(uri: string): Promise<Photo> {
     await FileSystem.copyAsync({ from: uri, to: dest });
 
     const info = await FileSystem.getInfoAsync(dest);
+    const size = info.exists && !info.isDirectory && typeof (info as any).size === "number" ? (info as any).size : 0;
 
     const photo: Photo = {
         id,
         uri: dest,
         createdAt: Date.now(),
-        size: info.size ?? 0,
+        size,
     };
 
     await FileSystem.writeAsStringAsync(

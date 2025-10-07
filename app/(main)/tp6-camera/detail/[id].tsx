@@ -1,11 +1,11 @@
-import { useRouter, useSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Alert, Image, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { deletePhoto, getPhoto } from "../../tp6-camera/lib/camera/storage";
 import { Photo } from "../../tp6-camera/lib/camera/types";
 
 export default function DetailScreen() {
-  const { id } = useSearchParams<{ id: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const [photo, setPhoto] = useState<Photo | null>(null);
   const router = useRouter();
 

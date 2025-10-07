@@ -1,13 +1,17 @@
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { usePhotoStorage } from "../tp6-camera/lib/hooks/usePhotoStorage";
 
 const NUM_COLUMNS = 3;
 
 export default function GalleryScreen() {
-  const { photos, loadPhotos } = usePhotoStorage();
+  const { photos, loadPhotos, loading } = usePhotoStorage();
   const router = useRouter();
+
+  useEffect(() => {
+    loadPhotos();
+  }, [loadPhotos]);
 
   const handlePhotoPress = (id: string) => {
     router.push(`/tp6-camera/detail/${id}`);
@@ -44,7 +48,7 @@ export default function GalleryScreen() {
         renderItem={renderItem}
         numColumns={NUM_COLUMNS}
         onRefresh={loadPhotos}
-        refreshing={false}
+        refreshing={loading}
         contentContainerStyle={{ paddingBottom: 80 }}
       />
 

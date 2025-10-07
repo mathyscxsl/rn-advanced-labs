@@ -1,17 +1,24 @@
-import { Camera } from "expo-camera";
+import { CameraView } from "expo-camera";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useCameraPermission } from "../tp6-camera/lib/hooks/useCameraPermission";
 import { usePhotoStorage } from "../tp6-camera/lib/hooks/usePhotoStorage";
 
 export default function CameraScreen() {
-  const cameraRef = useRef<Camera | null>(null);
-  const [type, setType] = useState(CameraType.back);
+  const cameraRef = useRef<CameraView | null>(null);
+  const [type, setType] = useState<"back" | "front">("back");
   const [isCapturing, setIsCapturing] = useState(false);
-  const router = useRouter();
 
-  const { granted, loading, requestPermission, openSettings } = useCameraPermission();
+  const router = useRouter();
+  const { granted, loading, openSettings } = useCameraPermission();
   const { addPhoto } = usePhotoStorage();
 
   if (loading) {
@@ -37,7 +44,7 @@ export default function CameraScreen() {
   }
 
   const handleSwitchCamera = () => {
-    setType((prev) => (prev === CameraType.back ? CameraType.front : CameraType.back));
+    setType((prev) => (prev === "back" ? "front" : "back"));
   };
 
   const handleTakePhoto = async () => {
@@ -45,9 +52,9 @@ export default function CameraScreen() {
     try {
       setIsCapturing(true);
       const photo = await cameraRef.current.takePictureAsync();
-      await addPhoto(photo.uri); // mise à jour automatique de la galerie
+      await addPhoto(photo.uri);
       Alert.alert("Photo enregistrée !");
-      router.back(); // retour vers la galerie
+      router.back();
     } catch (err) {
       console.error(err);
       Alert.alert("Erreur", "Impossible de prendre la photo");
@@ -58,7 +65,7 @@ export default function CameraScreen() {
 
   return (
     <View style={styles.container}>
-      <Camera style={styles.camera} type={type} ref={cameraRef} ratio="16:9" />
+      <CameraView style={styles.camera} facing={type} ref={cameraRef} /* ratio="16:9" */ />
 
       <View style={styles.controls}>
         <TouchableOpacity onPress={handleSwitchCamera} style={styles.buttonSmall}>
@@ -66,7 +73,11 @@ export default function CameraScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity onPress={handleTakePhoto} style={styles.shutter}>
-          {isCapturing ? <ActivityIndicator color="#fff" /> : <View style={styles.innerShutter} />}
+          {isCapturing ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <View style={styles.innerShutter} />
+          )}
         </TouchableOpacity>
       </View>
     </View>
