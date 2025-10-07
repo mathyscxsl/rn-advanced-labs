@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.example.rnadvancedlabs"
+      "bundleIdentifier": "com.example.rnadvancedlabs",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Cette application a besoin d'accéder à la caméra pour prendre des photos."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +24,10 @@
       },
       "package": "com.example.rnadvancedlabs",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "CAMERA"
+      ]
     },
     "web": {
       "output": "static",

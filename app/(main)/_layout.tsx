@@ -45,12 +45,41 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="tp5-robots-db"
+        name="tp5-robots-db/index"
         options={{
           title: "Robots DB",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="externaldrive" color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="tp6-camera/index"
+        options={{
+          title: "Galerie",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="photo.on.rectangle" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="tp6-camera/camera"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
+        name="tp6-camera/detail/[id]"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
+        name="tp5-robots-db/edit/[id]"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="tp5-robots-db/create"
+        options={{
+          href: null,
         }}
       />
       <Tabs.Screen
