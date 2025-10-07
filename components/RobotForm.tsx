@@ -29,19 +29,29 @@ interface RobotFormProps {
   initialValues?: Partial<Robot>;
   onSubmitSuccess?: () => void;
   robotId?: string;
+  existingRobots?: Robot[];
+  onSubmit?: (
+    values: Omit<Robot, "id">,
+    robotId?: string
+  ) => Promise<void> | void;
 }
 
 const RobotForm: React.FC<RobotFormProps> = ({
   initialValues,
   onSubmitSuccess,
   robotId,
+  existingRobots,
+  onSubmit,
 }) => {
   const { create, update, getById, robots } = useRobotsStore();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const robot = robotId ? getById(robotId) : null;
-
+  const robot = initialValues
+    ? (initialValues as Robot)
+    : robotId
+    ? getById(robotId)
+    : null;
   const formInitialValues = robot || {
     name: "",
     label: "",
@@ -82,8 +92,8 @@ const RobotForm: React.FC<RobotFormProps> = ({
                   "unique",
                   "Un robot avec ce nom existe déjà",
                   (value) =>
-                    !robots.some(
-                      (r) =>
+                    !((existingRobots ?? robots) || []).some(
+                      (r: Robot) =>
                         r.name.toLowerCase() === value?.toLowerCase() &&
                         r.id !== robotId
                     )
@@ -106,10 +116,14 @@ const RobotForm: React.FC<RobotFormProps> = ({
             })}
             onSubmit={async (values, { setSubmitting }) => {
               try {
-                if (robotId) {
-                  update(robotId, values as Omit<Robot, "id">);
+                if (onSubmit) {
+                  await onSubmit(values as Omit<Robot, "id">, robotId);
                 } else {
-                  create(values as Omit<Robot, "id">);
+                  if (robotId) {
+                    update(robotId, values as Omit<Robot, "id">);
+                  } else {
+                    create(values as Omit<Robot, "id">);
+                  }
                 }
                 setSubmitting(false);
                 Alert.alert(
