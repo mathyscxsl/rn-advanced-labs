@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -11,41 +11,19 @@ import {
 } from "react-native";
 import RobotListItem from "../../../components/RobotListItem";
 import {
-  list as repoList,
-  remove as repoRemove,
-  RobotRow,
-} from "../../../services/robotRepo";
+  useDeleteRobotMutation,
+  useRobotsQuery,
+} from "../../../hooks/useRobotsQuery";
 
 export default function RobotsDbList() {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<string>("name");
-  const [data, setData] = useState<RobotRow[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const fetchData = async () => {
-    setRefreshing(true);
-    try {
-      const rows = await repoList({ q, sort });
-      setData(rows);
-    } catch (e: any) {
-      Alert.alert("Erreur", e.message);
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [q, sort]);
+  const { data, isFetching, refetch } = useRobotsQuery({ q, sort });
+  const del = useDeleteRobotMutation();
 
   const onDelete = async (id: string) => {
-    try {
-      await repoRemove(id);
-      fetchData();
-    } catch (e: any) {
-      Alert.alert("Erreur", e.message);
-    }
+    del.mutate(id, { onError: (e: any) => Alert.alert("Erreur", e.message) });
   };
 
   const sortedHint = useMemo(
@@ -90,10 +68,10 @@ export default function RobotsDbList() {
       </View>
 
       <FlatList
-        data={data}
+        data={data ?? []}
         keyExtractor={(item) => item.id}
-        refreshing={refreshing}
-        onRefresh={fetchData}
+        refreshing={isFetching}
+        onRefresh={() => refetch()}
         renderItem={({ item }) => (
           <RobotListItem
             robot={{

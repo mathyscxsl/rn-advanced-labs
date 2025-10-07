@@ -4,6 +4,7 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, usePathname, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef } from "react";
@@ -18,6 +19,10 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const queryClientRef = useRef<QueryClient | null>(null);
+  if (!queryClientRef.current) {
+    queryClientRef.current = new QueryClient();
+  }
 
   const router = useRouter();
   const pathname = usePathname();
@@ -51,10 +56,12 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(main)" options={{ headerShown: false }} />
-      </Stack>
-      <StatusBar style="auto" />
+      <QueryClientProvider client={queryClientRef.current!}>
+        <Stack>
+          <Stack.Screen name="(main)" options={{ headerShown: false }} />
+        </Stack>
+        <StatusBar style="auto" />
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

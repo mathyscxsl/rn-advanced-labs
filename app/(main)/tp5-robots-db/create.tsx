@@ -2,15 +2,14 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import RobotForm from "../../../components/RobotForm";
-import {
-  create as repoCreate,
-  list as repoList,
-} from "../../../services/robotRepo";
+import { useCreateRobotMutation } from "../../../hooks/useRobotsQuery";
+import { list as repoList } from "../../../services/robotRepo";
 import { Robot } from "../../../validation/robotSchema";
 
 export default function CreateRobotScreen() {
   const router = useRouter();
   const [existing, setExisting] = useState<Robot[]>([] as any);
+  const createMut = useCreateRobotMutation();
 
   useEffect(() => {
     (async () => {
@@ -31,7 +30,7 @@ export default function CreateRobotScreen() {
       existingRobots={existing}
       onSubmit={async (values) => {
         const id = uuidv4();
-        await repoCreate({
+        await createMut.mutateAsync({
           id,
           name: values.name,
           label: values.label,

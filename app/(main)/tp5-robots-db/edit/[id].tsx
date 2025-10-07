@@ -2,10 +2,10 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, View } from "react-native";
 import RobotForm from "../../../../components/RobotForm";
+import { useUpdateRobotMutation } from "../../../../hooks/useRobotsQuery";
 import {
   getById as repoGet,
   list as repoList,
-  update as repoUpdate,
 } from "../../../../services/robotRepo";
 import { Robot } from "../../../../validation/robotSchema";
 
@@ -15,6 +15,7 @@ export default function EditRobotScreen() {
   const [initial, setInitial] = useState<Robot | null>(null);
   const [existing, setExisting] = useState<Robot[]>([] as any);
   const [loading, setLoading] = useState(true);
+  const updateMut = useUpdateRobotMutation();
 
   useEffect(() => {
     (async () => {
@@ -58,7 +59,7 @@ export default function EditRobotScreen() {
       initialValues={initial ?? undefined}
       existingRobots={existing}
       onSubmit={async (values) => {
-        await repoUpdate(id, values as any);
+        await updateMut.mutateAsync({ id, changes: values as any });
         router.replace("/tp5-robots-db" as any);
       }}
       onSubmitSuccess={() => {}}
