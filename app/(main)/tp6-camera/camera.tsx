@@ -1,9 +1,9 @@
 import { Camera } from "expo-camera";
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { savePhoto } from "../../../lib/camera/storage";
-import { useCameraPermission } from "../../../lib/hooks/useCameraPermission";
+import { useCameraPermission } from "../tp6-camera/lib/hooks/useCameraPermission";
+import { usePhotoStorage } from "../tp6-camera/lib/hooks/usePhotoStorage";
 
 export default function CameraScreen() {
   const cameraRef = useRef<Camera | null>(null);
@@ -12,12 +12,7 @@ export default function CameraScreen() {
   const router = useRouter();
 
   const { granted, loading, requestPermission, openSettings } = useCameraPermission();
-
-  useEffect(() => {
-    if (!loading && !granted) {
-      requestPermission();
-    }
-  }, [loading]);
+  const { addPhoto } = usePhotoStorage();
 
   if (loading) {
     return (
@@ -50,9 +45,9 @@ export default function CameraScreen() {
     try {
       setIsCapturing(true);
       const photo = await cameraRef.current.takePictureAsync();
-      const saved = await savePhoto(photo.uri);
-      Alert.alert("Photo enregistrée !", `ID : ${saved.id}`);
-      router.back(); // retour à la galerie
+      await addPhoto(photo.uri); // mise à jour automatique de la galerie
+      Alert.alert("Photo enregistrée !");
+      router.back(); // retour vers la galerie
     } catch (err) {
       console.error(err);
       Alert.alert("Erreur", "Impossible de prendre la photo");

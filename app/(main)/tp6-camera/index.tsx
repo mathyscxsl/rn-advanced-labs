@@ -1,29 +1,13 @@
-import { useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
-import { Dimensions, FlatList, Image, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { listPhotos } from "../tp6-camera/lib/camera/storage";
-import { Photo } from "../tp6-camera/lib/camera/types";
+import { useRouter } from "expo-router";
+import React from "react";
+import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { usePhotoStorage } from "../tp6-camera/lib/hooks/usePhotoStorage";
 
 const NUM_COLUMNS = 3;
 
 export default function GalleryScreen() {
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
+  const { photos, loadPhotos } = usePhotoStorage();
   const router = useRouter();
-
-  const loadPhotos = useCallback(async () => {
-    setRefreshing(true);
-    const data = await listPhotos();
-    setPhotos(data);
-    setRefreshing(false);
-  }, []);
-
-  // Rafraîchit automatiquement quand on revient à la galerie
-  useFocusEffect(
-    useCallback(() => {
-      loadPhotos();
-    }, [])
-  );
 
   const handlePhotoPress = (id: string) => {
     router.push(`/TP6-camera/detail/${id}`);
@@ -33,7 +17,7 @@ export default function GalleryScreen() {
     router.push("/TP6-camera/camera");
   };
 
-  const renderItem = ({ item }: { item: Photo }) => {
+  const renderItem = ({ item }: { item: any }) => {
     const size = Dimensions.get("window").width / NUM_COLUMNS - 4;
     return (
       <TouchableOpacity onPress={() => handlePhotoPress(item.id)} style={{ margin: 2 }}>
@@ -48,7 +32,7 @@ export default function GalleryScreen() {
 
   return (
     <View style={styles.container}>
-      {photos.length === 0 && !refreshing && (
+      {photos.length === 0 && (
         <View style={styles.empty}>
           <Text>Aucune photo pour l'instant</Text>
         </View>
@@ -59,7 +43,8 @@ export default function GalleryScreen() {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         numColumns={NUM_COLUMNS}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadPhotos} />}
+        onRefresh={loadPhotos}
+        refreshing={false}
         contentContainerStyle={{ paddingBottom: 80 }}
       />
 
