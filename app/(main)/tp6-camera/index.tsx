@@ -10,11 +10,11 @@ export default function GalleryScreen() {
   const router = useRouter();
 
   const handlePhotoPress = (id: string) => {
-    router.push(`/TP6-camera/detail/${id}`);
+    router.push(`/tp6-camera/detail/${id}`);
   };
 
   const handleTakePhoto = () => {
-    router.push("/TP6-camera/camera");
+    router.push("/tp6-camera/camera");
   };
 
   const renderItem = ({ item }: { item: any }) => {
