@@ -1,6 +1,6 @@
 import { openDb } from "../db";
 
-type RobotType = "industrial" | "service" | "medical" | "educational" | "other";
+export type RobotType = "industrial" | "service" | "medical" | "educational" | "other";
 
 export type RobotRow = {
   id: string;
@@ -106,15 +106,19 @@ export async function update(id: string, changes: UpdateRobotChanges): Promise<R
 
 export async function remove(id: string): Promise<void> {
   const db = await getDb();
+  // Hard delete: remove the row entirely from the database
+  await db.runAsync("DELETE FROM robots WHERE id = ?", [id]);
+}
+
+// Optional helper to permanently remove any previously archived rows
+export async function purgeArchived(): Promise<number> {
+  const db = await getDb();
   const info = await loadSchemaInfo();
-  if (info.hasArchived) {
-    const sets: string[] = ["archived = 1"];
-    if (info.hasUpdatedAt) sets.push("updated_at = CURRENT_TIMESTAMP");
-    const sql = `UPDATE robots SET ${sets.join(", ")} WHERE id = ?`;
-    await db.runAsync(sql, [id]);
-  } else {
-    await db.runAsync("DELETE FROM robots WHERE id = ?", [id]);
-  }
+  if (!info.hasArchived) return 0;
+  // returns the number of rows deleted
+  const res = await db.runAsync("DELETE FROM robots WHERE archived = 1");
+  // runAsync doesn't always return changes across platforms; best-effort 0/NaN safe
+  return (res as any)?.rowsAffected ?? 0;
 }
 
 export async function getById(id: string): Promise<RobotRow | null> {

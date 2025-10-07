@@ -14,6 +14,10 @@ import {
   useDeleteRobotMutation,
   useRobotsQuery,
 } from "../../../hooks/useRobotsQuery";
+import {
+  exportAndShareRobots,
+  pickAndImportRobots,
+} from "../../../services/backup";
 
 export default function RobotsDbList() {
   const router = useRouter();
@@ -50,6 +54,38 @@ export default function RobotsDbList() {
           onChangeText={setQ}
           style={styles.search}
         />
+        <View style={styles.actionsRow}>
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={async () => {
+              try {
+                const res = await exportAndShareRobots();
+                Alert.alert("Export", `Exporté ${res.count} robots`);
+              } catch (e: any) {
+                Alert.alert("Erreur", e.message);
+              }
+            }}
+          >
+            <Text style={styles.actionBtnText}>Exporter</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={async () => {
+              try {
+                const res = await pickAndImportRobots();
+                Alert.alert(
+                  "Import",
+                  `Créés: ${res.created} • Ignorés: ${res.skipped}`
+                );
+                refetch();
+              } catch (e: any) {
+                Alert.alert("Erreur", e.message);
+              }
+            }}
+          >
+            <Text style={styles.actionBtnText}>Importer</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.sortRow}>
           <TouchableOpacity
             style={styles.sortBtn}
@@ -116,6 +152,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   sortRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 8 },
+  actionsRow: { flexDirection: "row", gap: 8, marginTop: 8 },
+  actionBtn: {
+    paddingHorizontal: 12,
+    height: 36,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  actionBtnText: { color: "#000" },
   sortBtn: {
     paddingHorizontal: 12,
     height: 36,
