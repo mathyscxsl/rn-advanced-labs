@@ -1,150 +1,200 @@
 # RN Advanced Labs
 
-## Description de l'écran
+Ce dépôt regroupe plusieurs TP progressifs autour d’Expo Router, formulaires, state management, persistance locale (SQLite), fichiers, permissions et caméra.
 
-Cet écran correspond au premier écran de l'application : la **Profile Screen**.  
-Il contient une **Profile Card** qui affiche les informations de l'utilisateur (avatar, nom, rôle, etc.) et sert de base pour les prochains écrans de l'application.
+Sommaire rapide par TP:
 
-Ajouts récents (TP3 - Forms):
+- TP1 – Profile Card (UI + état local)
+- TP3 – Formulaires (Formik + Yup) et (RHF + Zod)
+- TP4 – Robots (Zustand, persistance AsyncStorage)
+- TP5 – Robots DB (SQLite + React Query, import/export JSON)
+- TP6 – Caméra (galerie, capture, détail + partage)
 
-- Formulaire (Formik) — `/(main)/tp3-forms/formik`
-- Formulaire (RHF + Zod) — `/(main)/tp3-forms/rhf`
-- Depuis chaque formulaire, un bouton dans le header permet de basculer rapidement vers l'autre (Formik ⇄ RHF) sans revenir à l'accueil.
+## Navigation, persistance et UX mobile
 
-Accès depuis l'accueil (Home):
+- Persistance de la dernière page visitée: `AsyncStorage` enregistre `__last_pathname__` à chaque changement d’URL et la route est restaurée au démarrage via `router.replace(savedPath)` (voir `app/_layout.tsx`).
+- Détail (groupe caché): interception `beforeRemove` pour remplacer le back natif par un retour direct à l’accueil (`router.replace("/(main)/")`, voir `app/(main)/(detail)/_layout.tsx`).
+- Onglets (Tabs): Home, Profile, Robots, Robots DB, Galerie (voir `app/(main)/_layout.tsx`).
+- Provider app: `ThemeProvider` (clair/sombre) + `QueryClientProvider` (React Query).
 
-- Lien « Formulaire (Formik) » présent sur la page d’accueil.
-- Lien « Formulaire (RHF + Zod) » présent sur la page d’accueil.
-- Les deux écrans proposent un bouton de switch dans le header (⇄) pour naviguer entre eux avec retour haptique.
+## Packages installés (sélection)
 
-## Persistance et UX mobile
-
-L'application persiste la dernière page visitée : à la réouverture, l'utilisateur est automatiquement ramené sur l'écran où il s'était arrêté (via AsyncStorage). L'UX reproduit les usages des applications mobiles classiques, avec un bouton de retour en haut à gauche sur les écrans de détail et un menu de navigation en bas pour accéder rapidement aux sections principales.
-
-- Persistance: `AsyncStorage` enregistre la clé `__last_pathname__` à chaque changement d'URL (voir `app/_layout.tsx`). Au démarrage, la route est restaurée via `router.replace(savedPath)`.
-- Bouton retour (écran Détail): interception de l'événement `beforeRemove` pour forcer un retour à l'accueil via `router.replace("/(main)/")` (voir `app/(main)/(detail)/_layout.tsx`).
-
----
-
-## Packages installés et rôle
-
-- expo: runtime Expo + CLI pour démarrer, builder et configurer le projet.
-- expo-router: routage fichier-par-fichier (Stack/Tabs) + deep linking automatique.
-- @react-navigation/native, @react-navigation/bottom-tabs, @react-navigation/elements: fondations React Navigation utilisées par Expo Router (thème, onglets, composants d’UI).
-- @react-native-async-storage/async-storage: persistance clé/valeur (restauration de la dernière route).
-- expo-linking: gestion du deep linking (utilisé par Expo Router).
-- expo-splash-screen, expo-status-bar, expo-system-ui, expo-constants, expo-font, expo-image, expo-web-browser, expo-haptics, expo-symbols: utilitaires Expo pour UI, médias, haptics et intégrations système.
-- react, react-native: base de l’app.
-- react-native-gesture-handler, react-native-reanimated, react-native-screens, react-native-safe-area-context: primitives de navigation/gestes/performances.
-- @expo/vector-icons: icônes tab bar.
-- react-native-web, react-dom: support Web.
-- react-native-worklets: API worklets (Reanimated v3+ écosystème).
-- Dev: typescript, @types/react, eslint, eslint-config-expo.
-
-Formulaires:
-
-- formik + yup: gestion contrôlée du state des champs + validation schéma.
-- react-hook-form (RHF): approche orientée inputs non contrôlés avec subscriptions (meilleur perfs), `Controller` pour inputs RN.
-- zod: schémas typés, inférence TypeScript.
-- @hookform/resolvers: intégration Zod ↔ RHF (à installer si absent: `npm i @hookform/resolvers`).
+- Navigation/Expo: expo, expo-router, @react-navigation/\*, expo-linking, expo-status-bar, expo-splash-screen, expo-system-ui, expo-constants, expo-font, expo-image, expo-web-browser, expo-haptics, expo-symbols.
+- UI/gesture: react-native-gesture-handler, react-native-reanimated, react-native-screens, react-native-safe-area-context, @expo/vector-icons.
+- State/persistance: @react-native-async-storage/async-storage, zustand, uuid.
+- Données: expo-sqlite, @tanstack/react-query.
+- Fichiers & partage: expo-file-system, expo-document-picker, expo-sharing.
+- Caméra & médias: expo-camera.
+- Formulaires/validation: formik, yup, react-hook-form, zod, @hookform/resolvers.
+- Dev: typescript, eslint, eslint-config-expo.
 
 Notes de config:
 
-- `app.json`: `scheme: "rnadvancedlabs"` (deep link), `experiments.typedRoutes: true` (types générés pour les routes).
-- `package.json`: entrée `main: "expo-router/entry"`.
+- `app.json`: `scheme: "rnadvancedlabs"` (deep link), `experiments.typedRoutes: true` (types de routes).
+- `package.json`: `main: "expo-router/entry"`.
 
 ---
 
-## Arborescence du projet (`app/`)
+## TP1 – Profile Card
+
+- Fichier: `app/(main)/tp1-profile-card/index.tsx`
+- Fonctionnalités:
+  - Carte profil simple: avatar, nom, compteur « followers » qui s’incrémente automatiquement.
+  - Bouton Follow/Unfollow qui met à jour l’état local.
+- Accès:
+  - Onglet « Profile » ou deep link externe `/tp1-profile-card`.
+
+## TP3 – Formulaires
+
+- Formik + Yup: `app/(main)/tp3-forms/formik/index.tsx`
+- RHF + Zod: `app/(main)/tp3-forms/rhf/index.tsx`
+- Détails communs:
+  - Chaque écran a un bouton de switch (⇄) dans le header pour basculer rapidement vers l’autre.
+  - Démonstration des patterns contrôlé (Formik) vs non contrôlé/Controller (RHF), avec schémas Yup/Zod.
+- Accès:
+  - Liens depuis Home; deep links `/tp3-forms/formik` et `/tp3-forms/rhf`.
+
+## TP4 – Robots (Zustand + AsyncStorage)
+
+- Écrans:
+  - Liste: `app/(main)/tp4-robots/index.tsx`
+  - Création: `app/(main)/tp4-robots/create.tsx`
+  - Édition: `app/(main)/tp4-robots/edit/[id].tsx`
+- Stockage: `zustand` avec persistance `AsyncStorage` (clé `robots-storage`, voir `store/robotStore.ts`).
+- UI: `FlatList` + `RobotListItem` (édition/suppression avec confirmation) + FAB « + ».
+- Formulaire: `components/RobotForm.tsx` (Formik + Yup, validation, choix de type via chips).
+- Accès:
+  - Onglet « Robots » (`/tp4-robots`), puis navigation interne pour créer/éditer.
+
+## TP5 – Robots DB (SQLite + React Query)
+
+- Écrans:
+  - Liste: `app/(main)/tp5-robots-db/index.tsx` (recherche `q`, tri `name`/`year` asc/desc).
+  - Création: `app/(main)/tp5-robots-db/create.tsx`
+  - Édition: `app/(main)/tp5-robots-db/edit/[id].tsx`
+- Données:
+  - Base `expo-sqlite` + migrations (`db/index.ts`):
+    - v1: table `robots` (id, name, label, year, type)
+    - v2: index sur `name`, `year`
+    - v3: colonne `archived` (par défaut 0)
+  - Repository (`services/robotRepo.ts`): CRUD, list avec recherche/tri/pagination, gestion conditionnelle de `archived` et `updated_at`.
+  - React Query (`hooks/useRobotsQuery.ts`): requêtes et mutations avec invalidation automatique.
+- Import/export:
+  - `services/backup.ts`: export JSON (nom horodaté), stockage dans `documentDirectory` (ou SAF Android), partage via `expo-sharing`.
+  - Import depuis fichier choisi (Document Picker) ou depuis le dernier export local trouvé; garde-fous (unicité par nom, champs requis).
+- Accès:
+  - Onglet « Robots DB » (`/tp5-robots-db`) + pages de création/édition.
+
+## TP6 – Caméra (galerie, capture, détail)
+
+- Écrans:
+  - Galerie: `app/(main)/tp6-camera/index.tsx` (grid 3 colonnes, pull-to-refresh, FAB pour capturer).
+  - Caméra: `app/(main)/tp6-camera/camera.tsx` (permission, switch front/back, capture, enregistrement local).
+  - Détail: `app/(main)/tp6-camera/detail/[id].tsx` (affichage, suppression, partage via `expo-sharing`).
+- Stockage:
+  - Fichiers sous `<documentDirectory>/photos` avec méta `*.json` par photo (voir `app/(main)/tp6-camera/lib/camera/storage.ts`).
+  - Hooks: `useCameraPermission` (demande + redirection vers réglages), `usePhotoStorage` (charger/ajouter/supprimer, état local).
+- Accès:
+  - Onglet « Galerie » (`/tp6-camera`) + écrans internes cachés dans les Tabs (`/tp6-camera/camera`, `/tp6-camera/detail/:id`).
+
+---
+
+## Arborescence (extrait `app/`)
 
 ```sh
 rn-advanced-labs
 └── app
-    ├── _layout.tsx                # Root Stack + restauration de route
-    ├── (main)/                    # Groupe principal (Tabs)
-    │   ├── _layout.tsx            # Tabs: Home, Profile, groupe Détail masqué
-    │   ├── index.tsx              # Home (onglet 1)
+    ├── _layout.tsx                 # Root Stack + persistance de route + React Query
+    ├── (main)/                     # Groupe principal (Tabs)
+    │   ├── _layout.tsx             # Tabs: Home, Profile, Robots, Robots DB, Galerie
+    │   ├── index.tsx               # Home
     │   ├── tp1-profile-card/
-    │   │   └── index.tsx          # Profile Card (onglet 2)
-    │   ├── (detail)/              # Groupe Stack (masqué dans la TabBar)
-    │   │   ├── _layout.tsx        # Stack avec header custom + back remplacé
-    │   │   └── [id].tsx           # Écran Détail dynamique
-    │   └── tp3-forms/
-    │       ├── formik/
-    │       │   ├── _layout.tsx    # Stack custom + bouton switch ⇄ RHF
-    │       │   └── index.tsx      # Formulaire avec Formik + Yup
-    │       └── rhf/
-    │           ├── _layout.tsx    # Stack custom + bouton switch ⇄ Formik
-    │           └── index.tsx      # Formulaire avec RHF + Zod
-    └── (auth)/                    # (placeholder)
+    │   │   └── index.tsx           # TP1
+    │   ├── (detail)/
+    │   │   ├── _layout.tsx         # Back remplacé ⇒ accueil
+    │   │   └── [id].tsx            # Détail dynamique
+    │   ├── tp3-forms/
+    │   │   ├── formik/
+    │   │   │   ├── _layout.tsx
+    │   │   │   └── index.tsx       # TP3 (Formik)
+    │   │   └── rhf/
+    │   │       ├── _layout.tsx
+    │   │       └── index.tsx       # TP3 (RHF)
+    │   ├── tp4-robots/
+    │   │   ├── index.tsx           # TP4 liste
+    │   │   ├── create.tsx          # TP4 création
+    │   │   └── edit/[id].tsx       # TP4 édition
+    │   ├── tp5-robots-db/
+    │   │   ├── index.tsx           # TP5 liste
+    │   │   ├── create.tsx          # TP5 création
+    │   │   └── edit/[id].tsx       # TP5 édition
+    │   └── tp6-camera/
+    │       ├── index.tsx           # TP6 galerie
+    │       ├── camera.tsx          # TP6 capture
+    │       └── detail/[id].tsx     # TP6 détail
 ```
 
-Rappels Expo Router:
-
-- Les groupes entre parenthèses (ex: `(main)`, `(detail)`) n’apparaissent pas dans l’URL externe; ils servent à organiser et à contrôler le type de navigateur (Tabs/Stack).
+Rappel Expo Router: les groupes entre parenthèses (ex: `(main)`, `(detail)`) n’apparaissent pas dans l’URL externe; ils structurent la navigation (Tabs/Stack).
 
 ---
 
 ## Table des routes
 
-| Nom (écran)         | Fichier                                 | Type               | URL externe (deep link) | Href interne (app)         | Paramètres   |
-| ------------------- | --------------------------------------- | ------------------ | ----------------------- | -------------------------- | ------------ |
-| Home                | `app/(main)/index.tsx`                  | Tab                | `/`                     | `/(main)` ou `/`           | —            |
-| Profile Card        | `app/(main)/tp1-profile-card/index.tsx` | Tab                | `/tp1-profile-card`     | `/(main)/tp1-profile-card` | —            |
-| Détail              | `app/(main)/(detail)/[id].tsx`          | Stack              | `/:id`                  | `/(detail)/:id`            | `id: string` |
-| Formulaire (Formik) | `app/(main)/tp3-forms/formik/index.tsx` | Page (masquée Tab) | `/tp3-forms/formik`     | `/(main)/tp3-forms/formik` | —            |
-| Formulaire (RHF)    | `app/(main)/tp3-forms/rhf/index.tsx`    | Page (masquée Tab) | `/tp3-forms/rhf`        | `/(main)/tp3-forms/rhf`    | —            |
+| Nom (écran)               | Fichier                                  | Type                 | URL externe (deep link)   | Href interne (app)               | Paramètres   |
+| ------------------------- | ---------------------------------------- | -------------------- | ------------------------- | -------------------------------- | ------------ |
+| Home                      | `app/(main)/index.tsx`                   | Tab                  | `/`                       | `/(main)` ou `/`                 | —            |
+| Profile Card (TP1)        | `app/(main)/tp1-profile-card/index.tsx`  | Tab                  | `/tp1-profile-card`       | `/(main)/tp1-profile-card`       | —            |
+| Détail                    | `app/(main)/(detail)/[id].tsx`           | Stack (caché)        | `/:id`                    | `/(detail)/:id`                  | `id: string` |
+| Formulaire (Formik) (TP3) | `app/(main)/tp3-forms/formik/index.tsx`  | Page (cachée Tab)    | `/tp3-forms/formik`       | `/(main)/tp3-forms/formik`       | —            |
+| Formulaire (RHF) (TP3)    | `app/(main)/tp3-forms/rhf/index.tsx`     | Page (cachée Tab)    | `/tp3-forms/rhf`          | `/(main)/tp3-forms/rhf`          | —            |
+| Robots (liste) (TP4)      | `app/(main)/tp4-robots/index.tsx`        | Tab                  | `/tp4-robots`             | `/(main)/tp4-robots`             | —            |
+| Robots (create) (TP4)     | `app/(main)/tp4-robots/create.tsx`       | Page (dans l’onglet) | `/tp4-robots/create`      | `/(main)/tp4-robots/create`      | —            |
+| Robots (edit) (TP4)       | `app/(main)/tp4-robots/edit/[id].tsx`    | Page (dans l’onglet) | `/tp4-robots/edit/:id`    | `/(main)/tp4-robots/edit/:id`    | `id: string` |
+| Robots DB (liste) (TP5)   | `app/(main)/tp5-robots-db/index.tsx`     | Tab                  | `/tp5-robots-db`          | `/(main)/tp5-robots-db`          | —            |
+| Robots DB (create) (TP5)  | `app/(main)/tp5-robots-db/create.tsx`    | Page (cachée Tab)    | `/tp5-robots-db/create`   | `/(main)/tp5-robots-db/create`   | —            |
+| Robots DB (edit) (TP5)    | `app/(main)/tp5-robots-db/edit/[id].tsx` | Page (cachée Tab)    | `/tp5-robots-db/edit/:id` | `/(main)/tp5-robots-db/edit/:id` | `id: string` |
+| Galerie (TP6)             | `app/(main)/tp6-camera/index.tsx`        | Tab                  | `/tp6-camera`             | `/(main)/tp6-camera`             | —            |
+| Caméra (TP6)              | `app/(main)/tp6-camera/camera.tsx`       | Page (cachée Tab)    | `/tp6-camera/camera`      | `/(main)/tp6-camera/camera`      | —            |
+| Photo détail (TP6)        | `app/(main)/tp6-camera/detail/[id].tsx`  | Page (cachée Tab)    | `/tp6-camera/detail/:id`  | `/(main)/tp6-camera/detail/:id`  | `id: string` |
 
-- Les colonnes « URL externe » ignorent les groupes entre parenthèses (comportement standard Expo Router).
-- Les `href` internes peuvent référencer les groupes pour cibler le bon navigateur (Tabs vs Stack).
+Notes:
 
-Exemples:
-
-- Interne: `Link href="/(detail)/42"` ouvre l’écran Détail avec `id=42`.
-- Externe (deep link Web): `https://<votre-domaine>/tp3-forms/formik`.
-- Externe (schéma natif): `rnadvancedlabs://tp3-forms/rhf`.
-
----
-
-## Formik vs RHF (retour d’expérience)
-
-DX (Developer eXperience):
-
-- Formik: API simple à appréhender (handleChange/handleBlur, errors, touched). Un peu verbeux sur RN (TextInput contrôlés). Schémas Yup séparés du type des valeurs.
-- RHF: API centrée sur la perf (non contrôlé). `Controller` s’intègre bien avec `TextInput`/`Switch`. DX excellente avec Zod (types inférés).
-
-Perf perçue et re-rendus:
-
-- Formik: les changements de champs provoquent des re-rendus du formulaire/fields selon la stratégie; sur des gros formulaires, on le ressent plus.
-- RHF: moins de re-rendus grâce aux subscriptions; chaque champ observe seulement ce qui le concerne.
-
-Instrumenter les re-rendus (exemples rapides):
-
-- Ajouter `console.count("Formik render")` dans `FormikSignupScreen` et `console.count("RHF render")` dans `RHFSignupScreen`.
-- Pour un champ, créer un petit composant `FieldContainer` et le wrapper avec `React.memo`, puis logguer `console.count("Field email render")` à l’intérieur pour comparer.
-
-Aide du typage TypeScript:
-
-- Formik + Yup: `Yup.InferType<typeof schema>` donne le type des valeurs, mais Formik ne lit pas directement ce type depuis Yup; il faut aussi typer `Formik<Values>`.
-- RHF + Zod: `z.infer<typeof schema>` + `zodResolver(schema)` synchronisent structure, messages et types; meilleure autocomplétion et erreurs plus précises.
-
-Verbosité:
-
-- Formik: pattern contrôlé ⇒ plus de props (`value`, `onChangeText`, `onBlur`) + gestion `touched` pour l’affichage des erreurs.
-- RHF: avec `Controller`, wiring concis; erreurs via `formState.errors` directement. Code souvent plus court, surtout sur de gros écrans.
-
-Recommandations:
-
-- Petits formulaires: Formik convient parfaitement et reste très lisible.
-- Formulaires moyens à grands: RHF + Zod recommandé (perfs et typage).
+- La colonne « URL externe » ignore les groupes entre parenthèses (comportement Expo Router).
+- Les écrans « cachés Tab » n’affichent pas d’onglet dédié mais restent dans la hiérarchie du groupe `(main)`.
 
 ---
 
 ## Comment tester rapidement
 
-- Ouvrir un détail depuis l’accueil: boutons « Page de l'ID … » dans `Home`.
-- Formulaires:
-  - Formik: `/(main)/tp3-forms/formik` (lien présent sur Home + bouton switch depuis RHF).
-  - RHF: `/(main)/tp3-forms/rhf` (lien présent sur Home + bouton switch depuis Formik).
-- Tuer l’app puis relancer: la dernière route est restaurée (par ex. l’écran Détail ou une page Formulaire).
-- Tester le deep link (Android): `adb shell am start -W -a android.intent.action.VIEW -d "rnadvancedlabs://tp3-forms/formik" com.example.rnadvancedlabs`.
+- Home → boutons « Page de l’ID … » pour ouvrir le Détail et tester le comportement de retour.
+- TP3 Formulaires:
+  - Formik: `/(main)/tp3-forms/formik` (lien Home + switch ⇄ depuis RHF).
+  - RHF: `/(main)/tp3-forms/rhf` (lien Home + switch ⇄ depuis Formik).
+- TP4 Robots (Zustand): onglet « Robots » → créer/éditer/supprimer un robot (persistance AsyncStorage).
+- TP5 Robots DB (SQLite): onglet « Robots DB » → recherche/tri; créer/éditer; export JSON + import via sélecteur de fichiers; partage.
+- TP6 Caméra: onglet « Galerie » → FAB pour capturer; ouvrir un détail pour partager/supprimer.
+- Persistance de la dernière route: tuez l’app puis relancez; vous revenez sur l’écran précédent (grâce à `__last_pathname__`).
+- Deep link (Android, exemple): `rnadvancedlabs://tp3-forms/formik`.
+
+---
+
+## Formik vs RHF (retour d’expérience – résumé)
+
+- DX:
+  - Formik: API simple mais plus verbeuse (inputs contrôlés, `touched`).
+  - RHF: très efficace avec `Controller` et Zod; types et messages cohérents.
+- Perfs: RHF limite les re-rendus via subscriptions; avantage sur formulaires moyens/grands.
+- Typage: `Yup.InferType` vs `z.infer` + `zodResolver` (meilleure intégration avec RHF).
+
+---
+
+## Démarrage (rappel)
+
+Dans le projet:
+
+```bash
+npm install
+npm run start
+```
+
+Choisir la plateforme (Android/iOS/Web) depuis Expo.
