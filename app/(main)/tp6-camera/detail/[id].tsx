@@ -1,6 +1,14 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
+import * as Sharing from "expo-sharing";
 import React, { useEffect, useState } from "react";
-import { Alert, Image, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { deletePhoto, getPhoto } from "../../tp6-camera/lib/camera/storage";
 import { Photo } from "../../tp6-camera/lib/camera/types";
 
@@ -38,7 +46,18 @@ export default function DetailScreen() {
   const handleShare = async () => {
     if (!photo) return;
     try {
-      await Share.share({ url: photo.uri });
+      const available = await Sharing.isAvailableAsync();
+      if (!available) {
+        Alert.alert(
+          "Partage indisponible",
+          "Le partage n'est pas disponible sur cet appareil."
+        );
+        return;
+      }
+      await Sharing.shareAsync(photo.uri, {
+        mimeType: "image/jpeg",
+        dialogTitle: "Partager la photo",
+      });
     } catch (err) {
       console.warn("Erreur partage :", err);
     }
@@ -54,7 +73,11 @@ export default function DetailScreen() {
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: photo.uri }} style={styles.image} resizeMode="contain" />
+      <Image
+        source={{ uri: photo.uri }}
+        style={styles.image}
+        resizeMode="contain"
+      />
       <View style={styles.controls}>
         <TouchableOpacity style={styles.button} onPress={handleDelete}>
           <Text style={styles.buttonText}>Supprimer</Text>
@@ -64,15 +87,27 @@ export default function DetailScreen() {
         </TouchableOpacity>
       </View>
       <Text style={styles.info}>Taille : {photo.size} bytes</Text>
-      <Text style={styles.info}>Créée le : {new Date(photo.createdAt).toLocaleString()}</Text>
+      <Text style={styles.info}>
+        Créée le : {new Date(photo.createdAt).toLocaleString()}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#000", alignItems: "center", justifyContent: "center" },
+  container: {
+    flex: 1,
+    backgroundColor: "#000",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   image: { flex: 1, width: "100%" },
-  controls: { flexDirection: "row", justifyContent: "space-around", width: "100%", padding: 12 },
+  controls: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    padding: 12,
+  },
   button: { backgroundColor: "#007AFF", padding: 12, borderRadius: 8 },
   buttonText: { color: "#fff", fontWeight: "600" },
   info: { color: "#fff", marginVertical: 4 },

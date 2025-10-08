@@ -1,6 +1,15 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import React, { useEffect } from "react";
-import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useCallback, useEffect } from "react";
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { usePhotoStorage } from "../tp6-camera/lib/hooks/usePhotoStorage";
 
 const NUM_COLUMNS = 3;
@@ -13,6 +22,12 @@ export default function GalleryScreen() {
     loadPhotos();
   }, [loadPhotos]);
 
+  useFocusEffect(
+    useCallback(() => {
+      loadPhotos();
+    }, [loadPhotos])
+  );
+
   const handlePhotoPress = (id: string) => {
     router.push(`/tp6-camera/detail/${id}`);
   };
@@ -24,10 +39,18 @@ export default function GalleryScreen() {
   const renderItem = ({ item }: { item: any }) => {
     const size = Dimensions.get("window").width / NUM_COLUMNS - 4;
     return (
-      <TouchableOpacity onPress={() => handlePhotoPress(item.id)} style={{ margin: 2 }}>
+      <TouchableOpacity
+        onPress={() => handlePhotoPress(item.id)}
+        style={{ margin: 2 }}
+      >
         <Image
           source={{ uri: item.uri }}
-          style={{ width: size, height: size, borderRadius: 8, backgroundColor: "#ccc" }}
+          style={{
+            width: size,
+            height: size,
+            borderRadius: 8,
+            backgroundColor: "#ccc",
+          }}
           resizeMode="cover"
         />
       </TouchableOpacity>
