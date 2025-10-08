@@ -11,11 +11,25 @@ export async function ensurePhotoDirExists() {
     }
 }
 
+function getExtensionFromUri(uri: string): string {
+    try {
+        const clean = uri.split("?")[0];
+        const match = clean.match(/\.([a-zA-Z0-9]+)$/);
+        const ext = (match?.[1] || "jpg").toLowerCase();
+        // Allow only known common image extensions; default to jpg
+        if (["jpg", "jpeg", "png", "heic", "webp"].includes(ext)) return ext;
+        return "jpg";
+    } catch {
+        return "jpg";
+    }
+}
+
 export async function savePhoto(uri: string): Promise<Photo> {
     await ensurePhotoDirExists();
 
     const id = `photo_${Date.now()}`;
-    const fileName = `${id}.jpg`;
+    const ext = getExtensionFromUri(uri);
+    const fileName = `${id}.${ext}`;
     const dest = `${PHOTOS_DIR}/${fileName}`;
 
     await FileSystem.copyAsync({ from: uri, to: dest });
@@ -69,6 +83,22 @@ export async function getPhoto(id: string): Promise<Photo | null> {
 }
 
 export async function deletePhoto(id: string): Promise<void> {
-    await FileSystem.deleteAsync(`${PHOTOS_DIR}/${id}.jpg`, { idempotent: true });
-    await FileSystem.deleteAsync(`${PHOTOS_DIR}/${id}.json`, { idempotent: true });
+    // Try to read metadata to get the exact image URI to delete
+    try {
+        const json = await FileSystem.readAsStringAsync(`${PHOTOS_DIR}/${id}.json`);
+        const meta = JSON.parse(json) as Photo;
+        if (meta?.uri) {
+            await FileSystem.deleteAsync(meta.uri, { idempotent: true });
+        } else {
+            // Fallback to jpg if no uri
+            await FileSystem.deleteAsync(`${PHOTOS_DIR}/${id}.jpg`, { idempotent: true });
+        }
+    } catch {
+        // If metadata missing, attempt common extensions
+        for (const ext of ["jpg", "jpeg", "png", "heic", "webp"]) {
+            try { await FileSystem.deleteAsync(`${PHOTOS_DIR}/${id}.${ext}`, { idempotent: true }); } catch {}
+        }
+    } finally {
+        try { await FileSystem.deleteAsync(`${PHOTOS_DIR}/${id}.json`, { idempotent: true }); } catch {}
+    }
 }
